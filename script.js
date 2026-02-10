@@ -4,6 +4,7 @@ const elDate = document.getElementById("date");
 const elCP1 = document.getElementById("cp1");
 const elCP2 = document.getElementById("cp2");
 const elCP3 = document.getElementById("cp3");
+const elCPSite = document.getElementById("cpSite");
 const elScriptUrl = document.getElementById("scriptUrl");
 const statusEl = document.getElementById("status");
 
@@ -36,6 +37,7 @@ function save(){
       cp1: elCP1.value || "",
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
+      cpSite: elCPSite.value || "CP2",
       scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
@@ -75,6 +77,7 @@ function load(){
     elCP1.value = data.header?.cp1 || "";
     elCP2.value = data.header?.cp2 || "";
     elCP3.value = data.header?.cp3 || "";
+    elCPSite.value = data.header?.cpSite || "";
     elScriptUrl.value = data.header?.scriptUrl || "";
     elDraftKey.value = data.header?.draftKey || "";
 
@@ -300,6 +303,7 @@ function buildPayload(){
     cp1: elCP1.value || "",
     cp2: elCP2.value || "",
     cp3: elCP3.value || "",
+    cpSite: elCPSite.value || "CP2",
     manpower: manpowerFiltered,
     equipment: serializeEquip(rowsEquip)
   };
@@ -422,6 +426,7 @@ function buildDraftObject() {
       cp1: elCP1.value || "",
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
+      cpSite: elCPSite.value || "CP2",
       scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
@@ -468,6 +473,7 @@ function saveLocalSilent(){
       cp1: elCP1.value || "",
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
+      cpSite: elCPSite.value || "CP2",
       scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
@@ -523,6 +529,7 @@ function loadDraftFromCloud() {
       elCP1.value = d.header?.cp1 || elCP1.value;
       elCP2.value = d.header?.cp2 || elCP2.value;
       elCP3.value = d.header?.cp3 || elCP3.value;
+      elCPSite.value = d.header?.cpSite || elCPSite.value;
 
       rowsHEO.innerHTML = "";
       rowsSpotter.innerHTML = "";
