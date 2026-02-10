@@ -21,7 +21,7 @@ h1{margin:0 0 14px;font-size:26px}
 
 .topRow{
   display:grid;
-  grid-template-columns: 200px 200px 200px 1fr;
+  grid-template-columns: 200px 150px 150px 1fr;
   gap:12px;
   align-items:end;
   margin-bottom:14px;
