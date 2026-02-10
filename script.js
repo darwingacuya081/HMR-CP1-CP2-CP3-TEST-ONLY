@@ -37,7 +37,7 @@ function save(){
       cp1: elCP1.value || "",
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
-      cpSite: elCPSite.value || "CP2",
+      cpSite: (elCPSite?.value || "CP2").trim(),
       scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
@@ -303,7 +303,7 @@ function buildPayload(){
     cp1: elCP1.value || "",
     cp2: elCP2.value || "",
     cp3: elCP3.value || "",
-    cpSite: elCPSite.value || "CP2",
+    cpSite: (elCPSite?.value || "CP2").trim(),
     manpower: manpowerFiltered,
     equipment: serializeEquip(rowsEquip)
   };
@@ -426,7 +426,7 @@ function buildDraftObject() {
       cp1: elCP1.value || "",
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
-      cpSite: elCPSite.value || "CP2",
+      cpSite: (elCPSite?.value || "CP2").trim(),
       scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
@@ -473,7 +473,7 @@ function saveLocalSilent(){
       cp1: elCP1.value || "",
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
-      cpSite: elCPSite.value || "CP2",
+      cpSite: (elCPSite?.value || "CP2").trim(),
       scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
