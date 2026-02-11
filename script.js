@@ -510,9 +510,6 @@ async function loadDraftFromCloud() {
     u.searchParams.set("action", "draftGet");
     u.searchParams.set("key", key);
 
-    // Force fresh when user clicks load (optional)
-    u.searchParams.set("t", Date.now().toString());
-
     const res = await fetch(u.toString(), { method: "GET" });
     const json = await res.json();
 
