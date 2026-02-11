@@ -453,13 +453,17 @@ async function saveDraftToCloud() {
 
   setStatus("Saving draft to cloud...");
   try {
-    await fetch(url, {
+    const res = await fetch(url, {
       method: "POST",
-      mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
-    saveLocalSilent()
+
+    const text = await res.text(); // helps debugging
+    // optional parse
+    // let json; try { json = JSON.parse(text); } catch { json = null; }
+
+    saveLocalSilent();
     setStatus("Draft saved to cloud ✅");
   } catch (e) {
     setStatus("Draft save failed: " + e.message, false);
@@ -494,63 +498,57 @@ function saveLocalSilent(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-function loadDraftFromCloud() {
+async function loadDraftFromCloud() {
   const url = (elScriptUrl.value || "").trim();
   const key = (elDraftKey.value || "").trim();
   if (!url || !key) return setStatus("Set Script URL and Draft Key first.", false);
 
   setStatus("Loading draft from cloud...");
 
-  // JSONP callback name (unique each call)
-  const cb = "__draft_cb_" + Date.now();
+  try {
+    const u = new URL(url);
+    u.searchParams.set("action", "draftGet");
+    u.searchParams.set("key", key);
 
-  // Build URL with action + key + cb
-  const u = new URL(url);
-  u.searchParams.set("action", "draftGet");
-  u.searchParams.set("key", key);
-  u.searchParams.set("src", (elScriptUrl.value || "").trim());  // ✅ ADD THIS
-  u.searchParams.set("cb", cb);
+    // Force fresh when user clicks load (optional)
+    u.searchParams.set("t", Date.now().toString());
 
-  // Define callback
-  window[cb] = (json) => {
-    try {
-      if (!json || json.status !== "ok") {
-        setStatus((json && json.message) || "Draft load failed", false);
-        return;
-      }
-      if (!json.data) {
-        setStatus("No saved draft found for that key.", false);
-        return;
-      }
+    const res = await fetch(u.toString(), { method: "GET" });
+    const json = await res.json();
 
-      const d = json.data;
-
-      elDate.value = d.header?.date || elDate.value;
-      elCP1.value = d.header?.cp1 || elCP1.value;
-      elCP2.value = d.header?.cp2 || elCP2.value;
-      elCP3.value = d.header?.cp3 || elCP3.value;
-      elCPSite.value = d.header?.cpSite || elCPSite.value;
-
-      rowsHEO.innerHTML = "";
-      rowsSpotter.innerHTML = "";
-      rowsHelper.innerHTML = "";
-      rowsFlagman.innerHTML = "";
-      rowsEquip.innerHTML = "";
-
-      (d.manpower?.HEO || []).forEach(r => addManRow("HEO", r));
-      (d.manpower?.Spotter || []).forEach(r => addManRow("Spotter", r));
-      (d.manpower?.Helper || []).forEach(r => addManRow("Helper", r));
-      (d.manpower?.Flagman || []).forEach(r => addManRow("Flagman", r));
-      (d.equipment || []).forEach(r => addEquipRow(r));
-
-      saveLocalSilent()
-      setStatus("Loaded draft from cloud ✅");
-    } finally {
-      // cleanup
-      delete window[cb];
-      script.remove();
+    if (!json || json.status !== "ok") {
+      return setStatus((json && json.message) || "Draft load failed", false);
     }
-  };
+    if (!json.data) {
+      return setStatus("No saved draft found for that key.", false);
+    }
+
+    const d = json.data;
+
+    elDate.value = d.header?.date || elDate.value;
+    elCP1.value = d.header?.cp1 || elCP1.value;
+    elCP2.value = d.header?.cp2 || elCP2.value;
+    elCP3.value = d.header?.cp3 || elCP3.value;
+    elCPSite.value = d.header?.cpSite || elCPSite.value;
+
+    rowsHEO.innerHTML = "";
+    rowsSpotter.innerHTML = "";
+    rowsHelper.innerHTML = "";
+    rowsFlagman.innerHTML = "";
+    rowsEquip.innerHTML = "";
+
+    (d.manpower?.HEO || []).forEach(r => addManRow("HEO", r));
+    (d.manpower?.Spotter || []).forEach(r => addManRow("Spotter", r));
+    (d.manpower?.Helper || []).forEach(r => addManRow("Helper", r));
+    (d.manpower?.Flagman || []).forEach(r => addManRow("Flagman", r));
+    (d.equipment || []).forEach(r => addEquipRow(r));
+
+    saveLocalSilent();
+    setStatus("Loaded draft from cloud ✅");
+  } catch (e) {
+    setStatus("Draft load failed: " + e.message, false);
+  }
+}
 
   // Inject script tag (JSONP)
   const script = document.createElement("script");
