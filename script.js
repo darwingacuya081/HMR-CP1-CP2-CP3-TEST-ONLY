@@ -551,11 +551,11 @@ async function loadDraftFromCloud() {
 if (btnSaveDraft) btnSaveDraft.addEventListener("click", saveDraftToCloud);
 if (btnLoadDraft) btnLoadDraft.addEventListener("click", loadDraftFromCloud);
 
-function autoLoadDraftIfReady() {
-  const url = (elScriptUrl.value || "").trim();
-  const key = (elDraftKey.value || "").trim();
-  if (url && key) loadDraftFromCloud();
-}
+// function autoLoadDraftIfReady() {
+//   const url = (elScriptUrl.value || "").trim();
+//   const key = (elDraftKey.value || "").trim();
+//   if (url && key) loadDraftFromCloud();
+// }
 
 // INIT
 load();
