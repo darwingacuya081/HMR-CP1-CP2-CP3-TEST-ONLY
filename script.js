@@ -550,17 +550,6 @@ async function loadDraftFromCloud() {
   }
 }
 
-  // Inject script tag (JSONP)
-  const script = document.createElement("script");
-  script.src = u.toString();
-  script.onerror = () => {
-    setStatus("Draft load failed (network/CORS).", false);
-    delete window[cb];
-    script.remove();
-  };
-  document.body.appendChild(script);
-}
-
 // --- Draft sync listeners (attach once) ---
 if (btnSaveDraft) btnSaveDraft.addEventListener("click", saveDraftToCloud);
 if (btnLoadDraft) btnLoadDraft.addEventListener("click", loadDraftFromCloud);
