@@ -288,24 +288,38 @@ document.getElementById("clearSaved").addEventListener("click", () => {
 [elDate, elCP1, elCP2, elCP3, elScriptUrl].forEach(el => el.addEventListener("input", save));
 
 // ---------- Submit ----------
-function buildPayload(){
+function buildPayload() {
   const manpowerAll = [
-    ...serializeMan(rowsHEO).map(r => ({ role:"HEO", ...r })),
-    ...serializeMan(rowsSpotter).map(r => ({ role:"Spotter", ...r })),
-    ...serializeMan(rowsHelper).map(r => ({ role:"Helper", ...r })),
-    ...serializeMan(rowsFlagman).map(r => ({ role:"Flagman", ...r }))
+    ...serializeMan(rowsHEO).map(r => ({ role: "HEO", ...r })),
+    ...serializeMan(rowsSpotter).map(r => ({ role: "Spotter", ...r })),
+    ...serializeMan(rowsHelper).map(r => ({ role: "Helper", ...r })),
+    ...serializeMan(rowsFlagman).map(r => ({ role: "Flagman", ...r })),
   ];
 
-  // ✅ Filter rule: don't submit if Work Hours is blank (or not a number)
+  // ✅ Option A: submit manpower if name exists AND (work>0 OR ot>0)
   const manpowerFiltered = manpowerAll.filter(r => {
     const name = String(r.name || "").trim();
-    const work = parseFloat(r.workHours);
-  
     if (!name) return false;
-    if (!Number.isFinite(work)) return false;
-    if (work <= 0) return false;
-  
-    return true;
+
+    const work = parseFloat(r.workHours);
+    const ot   = parseFloat(r.otHours);
+
+    const hasWork = Number.isFinite(work) && work > 0;
+    const hasOT   = Number.isFinite(ot) && ot > 0;
+
+    return hasWork || hasOT;
+  });
+
+  // Optional: normalize numbers so Apps Script gets clean values
+  const manpowerClean = manpowerFiltered.map(r => {
+    const work = parseFloat(r.workHours);
+    const ot   = parseFloat(r.otHours);
+    return {
+      role: r.role,
+      name: String(r.name || "").trim(),
+      workHours: (Number.isFinite(work) ? work : 0),
+      otHours: (Number.isFinite(ot) ? ot : 0),
+    };
   });
 
   return {
@@ -314,10 +328,11 @@ function buildPayload(){
     cp2: elCP2.value || "",
     cp3: elCP3.value || "",
     cpSite: (elCPSite?.value || "CP2").trim(),
-    manpower: manpowerFiltered,
-    equipment: serializeEquip(rowsEquip)
+    manpower: manpowerClean,
+    equipment: serializeEquip(rowsEquip),
   };
 }
+
 
 async function submitAll(){
   const url = FIXED_API_URL;
