@@ -1,11 +1,20 @@
 const STORAGE_KEY = "hmr_ui_sketch_v1";
 
+const FIXED_API_URL = "https://hmr-proxy.darwin-gacuya081.workers.dev/";
+
 const elDate = document.getElementById("date");
 const elCP1 = document.getElementById("cp1");
 const elCP2 = document.getElementById("cp2");
 const elCP3 = document.getElementById("cp3");
 const elCPSite = document.getElementById("cpSite");
+
 const elScriptUrl = document.getElementById("scriptUrl");
+// Force the textbox to the fixed URL (and lock it)
+if (elScriptUrl) {
+  elScriptUrl.value = FIXED_API_URL;
+  elScriptUrl.readOnly = true;
+}
+
 const statusEl = document.getElementById("status");
 
 const rowsHEO = document.getElementById("rows-HEO");
@@ -41,7 +50,6 @@ function save(){
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
       cpSite: (elCPSite?.value || "CP2").trim(),
-      scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
     manpower: {
@@ -81,7 +89,6 @@ function load(){
     elCP2.value = data.header?.cp2 || "";
     elCP3.value = data.header?.cp3 || "";
     elCPSite.value = data.header?.cpSite || "";
-    elScriptUrl.value = data.header?.scriptUrl || "";
     elDraftKey.value = data.header?.draftKey || "";
 
     rowsHEO.innerHTML = "";
@@ -313,8 +320,7 @@ function buildPayload(){
 }
 
 async function submitAll(){
-  const url = elScriptUrl.value.trim();
-  if(!url) return setStatus("Paste Apps Script Web App URL first.", false);
+  const url = FIXED_API_URL;
 
   const payload = buildPayload();
   if(!payload.date) return setStatus("Date is required.", false);
@@ -358,8 +364,7 @@ function fillDatalist(id, items) {
 }
 
 async function refreshMasterData() {
-  const url = (elScriptUrl.value || "").trim();
-  if (!url) return;
+  const url = FIXED_API_URL;
 
   try {
     // Works whether your URL already has ? or not
@@ -430,7 +435,6 @@ function buildDraftObject() {
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
       cpSite: (elCPSite?.value || "CP2").trim(),
-      scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
     manpower: {
@@ -444,7 +448,7 @@ function buildDraftObject() {
 }
 
 async function saveDraftToCloud() {
-  const url = (elScriptUrl.value || "").trim();
+  const url = FIXED_API_URL;
   const key = (elDraftKey.value || "").trim();
   if (!url || !key) return setStatus("Set Script URL and Draft Key first.", false);
 
@@ -487,7 +491,6 @@ function saveLocalSilent(){
       cp2: elCP2.value || "",
       cp3: elCP3.value || "",
       cpSite: (elCPSite?.value || "CP2").trim(),
-      scriptUrl: elScriptUrl.value || "",
       draftKey: elDraftKey.value || ""
     },
     manpower: {
@@ -530,7 +533,7 @@ function applyDraft(d) {
 }
 
 async function loadDraftFromCloud() {
-  const url = (elScriptUrl.value || "").trim();
+  const url = FIXED_API_URL;
   const key = (elDraftKey.value || "").trim();
   if (!url || !key) return setStatus("Set Script URL and Draft Key first.", false);
 
@@ -584,15 +587,22 @@ if (btnSaveDraft) btnSaveDraft.addEventListener("click", saveDraftToCloud);
 if (btnLoadDraft) btnLoadDraft.addEventListener("click", loadDraftFromCloud);
 
 // function autoLoadDraftIfReady() {
-//   const url = (elScriptUrl.value || "").trim();
+//   const url = FIXED_API_URL;
 //   const key = (elDraftKey.value || "").trim();
 //   if (url && key) loadDraftFromCloud();
 // }
 
 // INIT
 load();
+
+// ensure the fixed URL is shown (optional)
+if (elScriptUrl) {
+  elScriptUrl.value = FIXED_API_URL;
+  elScriptUrl.readOnly = true;
+}
+
 refreshMasterData();
 
 // When scriptUrl changes, re-fetch autocomplete
-elScriptUrl.addEventListener("change", refreshMasterData);
-elScriptUrl.addEventListener("blur", refreshMasterData);
+// elScriptUrl.addEventListener("change", refreshMasterData);
+// elScriptUrl.addEventListener("blur", refreshMasterData);
